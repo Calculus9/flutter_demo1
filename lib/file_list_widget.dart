@@ -7,7 +7,7 @@ typedef OnDiskFileTapCallback = void Function(DiskFile file);
 class FileListWidget extends StatelessWidget {
   List<DiskFile> _listOfDiskFiles;
   OnDiskFileTapCallback _diskFileTapCallback;
-  
+
   FileListWidget(this._listOfDiskFiles, this._diskFileTapCallback);
 
   Widget _buildFolderItem(BuildContext context, DiskFile file) {
@@ -27,6 +27,7 @@ class FileListWidget extends StatelessWidget {
   }
 
   Widget _buildFileItem(BuildContext context, DiskFile file) {
+    // 水波纹
     return InkWell(
       child: Container(
         child: ListTile(
@@ -53,7 +54,7 @@ class FileListWidget extends StatelessWidget {
               Text("当前目录下没有文件")
             ],
           )
-        : ListView.builder(
+        : ListView.builder(/// 滚动列表
             itemCount: this._listOfDiskFiles.length,
             physics: BouncingScrollPhysics(),
             shrinkWrap: true,

@@ -107,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
   /// 账户输入框
   Widget _buildAccountEditTextField() {
     return Container(
-      margin: EdgeInsets.only(top: 20),
+      margin: EdgeInsets.only(top: 20,left: 25,right: 25),
       child: TextField(
         onChanged: (text) => {
           _accountText = text,
@@ -128,7 +128,7 @@ class _LoginPageState extends State<LoginPage> {
   ///密码输入框
   Widget _buildPwdEditTextField() {
     return Container(
-      margin: EdgeInsets.only(top: 10),
+      margin: EdgeInsets.only(top: 20,left: 25,right: 25),
       child: TextField(
         onChanged: (text) => {
           _pwdText = text,
@@ -160,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
   /// 登录按钮
   Widget _buildButtonLogin() {
     return Container(
-        margin: EdgeInsets.only(top: 30),
+        margin: EdgeInsets.only(top: 20,left: 25,right: 25),
         width: MediaQuery.of(context).size.width,
         height: 45,
         // ignore: deprecated_member_use
