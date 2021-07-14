@@ -95,6 +95,9 @@ class _MyHomePageState extends State<MyHomePage> {
     print(keyword);
   }
 
+  _onDiskFileTap(DiskFile file){
+
+  }
   @override
   void initState() {
     listofDiskFiles = _rootPathFilesDir;
@@ -115,7 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: SearchInputWidget(
                   _onSubmittedSearchInputWidget, _onFocusSearchInputWidget),
             ),
-            Center(child: FileListWidget(listofDiskFiles))
+            Center(child: FileListWidget(listofDiskFiles,_onDiskFileTap))
           ],
         ),
       ),

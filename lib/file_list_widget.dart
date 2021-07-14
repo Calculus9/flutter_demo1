@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_demo1/disk_file.dart';
 
 // ignore: must_be_immutable
+typedef OnDiskFileTapCallback = void Function(DiskFile file);
+
 class FileListWidget extends StatelessWidget {
   List<DiskFile> _listOfDiskFiles;
-  FileListWidget(this._listOfDiskFiles);
+  OnDiskFileTapCallback _diskFileTapCallback;
+  FileListWidget(this._listOfDiskFiles, _diskFileTapCallback);
 
   Widget _buildFolderItem(BuildContext context, DiskFile file) {
     return InkWell(
@@ -18,6 +21,7 @@ class FileListWidget extends StatelessWidget {
           trailing: Icon(Icons.chevron_right),
         ),
       ),
+      onTap: () => _diskFileTapCallback(file),
     );
   }
 
@@ -32,6 +36,7 @@ class FileListWidget extends StatelessWidget {
           subtitle: Text(file.serverCtime.toString()),
         ),
       ),
+      onTap: () => _diskFileTapCallback(file),
     );
   }
 
