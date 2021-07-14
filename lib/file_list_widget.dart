@@ -4,6 +4,7 @@ import 'package:flutter_demo1/disk_file.dart';
 // ignore: must_be_immutable
 typedef OnDiskFileTapCallback = void Function(DiskFile file);
 
+// ignore: must_be_immutable
 class FileListWidget extends StatelessWidget {
   List<DiskFile> _listOfDiskFiles;
   OnDiskFileTapCallback _diskFileTapCallback;
@@ -54,7 +55,8 @@ class FileListWidget extends StatelessWidget {
               Text("当前目录下没有文件")
             ],
           )
-        : ListView.builder(/// 滚动列表
+        : ListView.builder(
+            /// 滚动列表
             itemCount: this._listOfDiskFiles.length,
             physics: BouncingScrollPhysics(),
             shrinkWrap: true,

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo1/search_input_widget.dart';
+import 'package:flutter_demo1/search_page.dart';
 import 'package:flutter_demo1/utils.dart';
 
 import 'disk_file.dart';
@@ -72,13 +73,14 @@ class _FilePageState extends State<FilePage> {
 
   /// 搜索框被点击
   _onFocusSearchInputWidget() {
-    print("搜索框被点击");
+    // Navigator.of(context).pop();
+    Navigator.of(context).push(
+      new MaterialPageRoute(builder: (context) => new SearchPage()),
+    );
   }
 
   /// 提交搜索框内容
-  _onSubmittedSearchInputWidget(String keyword) {
-    print(keyword);
-  }
+  _onSubmittedSearchInputWidget(String keyword) {}
 
   /// 更新磁盘文件
   _refreshDiskFiles() {
@@ -137,8 +139,7 @@ class _FilePageState extends State<FilePage> {
             Container(
               margin: EdgeInsets.only(top: 10, left: 10, right: 10),
               height: 45,
-              child: SearchInputWidget(
-                  _onSubmittedSearchInputWidget, _onFocusSearchInputWidget),
+              child: SearchInputWidget(onTap: _onFocusSearchInputWidget),
             ),
             Center(child: FileListWidget(listOfDiskFiles, _onDiskFileTap))
           ],

@@ -101,8 +101,8 @@ class _PersonalCenterState extends State<PersonalCenter> {
   Widget _gridViewList() {
     return Container(
       child: GridView.count(
-        crossAxisSpacing: 10, // 水平 子Widget 距离
-        mainAxisSpacing: 10, // 垂直 子Widget 距离
+        crossAxisSpacing: 10, // 水平子 Widget 距离
+        mainAxisSpacing: 10, // 垂直子 Widget 距离
         padding: EdgeInsets.all(10),
         crossAxisCount: 4, // 控制一行widget的数量
         childAspectRatio: 0.7, // 宽度和高度的比例
@@ -135,6 +135,7 @@ class _PersonalCenterState extends State<PersonalCenter> {
   }
 }
 
+// ignore: must_be_immutable
 class GridContent extends StatelessWidget {
   /// 图片地址
   String imgUrl;
