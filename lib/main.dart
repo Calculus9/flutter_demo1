@@ -27,22 +27,24 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<DiskFile> listofDiskFiles = [];
+  /// 文件列表
+  List<DiskFile> listOfDiskFiles = [];
 
+  /// 根目录
   final _rootPathFilesDir = [
     DiskFile(
-      path: '/实验室1',
-      serverFilename: '实验1',
+      path: '/实验室一',
+      serverFilename: '实验一',
       serverCtime: Utils.currentTimeSeconds(),
     ),
     DiskFile(
-      path: '/实验室2',
-      serverFilename: '实验2',
+      path: '/实验室二',
+      serverFilename: '实验二',
       serverCtime: Utils.currentTimeSeconds(),
     ),
     DiskFile(
-      path: '/实验室3',
-      serverFilename: '实验3',
+      path: '/实验室三',
+      serverFilename: '实验三',
       serverCtime: Utils.currentTimeSeconds(),
     ),
     DiskFile(
@@ -53,31 +55,34 @@ class _MyHomePageState extends State<MyHomePage> {
         category: 4,
         size: 989),
     DiskFile(
-        path: ' /第二 讲.pptx',
-        serverFilename: ' 第二讲. pptx',
+        path: '/第二讲.pptx',
+        serverFilename: '第二讲.pptx',
         serverCtime: Utils.currentTimeSeconds(),
         isDir: 0,
         category: 4,
         size: 9839),
   ];
 
+  /// 子目录
   final _subPathFilesDir = [
     DiskFile(
-      path: ' /实验室一/源代码',
+      path: '/实验室一/源代码',
       serverFilename: '源代码',
       serverCtime: Utils.currentTimeSeconds(),
     ),
     DiskFile(
-        path: '/实验室 -/实验指导书. pdf',
-        serverFilename: ' 实验指导书. pdf',
+        path: '/实验室一/实验指导书. pdf',
+        serverFilename: '实验指导书. pdf',
         serverCtime: Utils.currentTimeSeconds(),
         isDir: 0,
         category: 4,
         size: 983),
   ];
+
+  /// 空文件夹
   final List<DiskFile> _emptyDir = [];
-  var _diskFiles = [];
-  String _title = ' 根目录';
+
+  String _title = '根目录';
   String _currPath = '/';
 
   var _selectedIndex = 0; // 当前page
@@ -95,12 +100,28 @@ class _MyHomePageState extends State<MyHomePage> {
     print(keyword);
   }
 
-  _onDiskFileTap(DiskFile file){
+  _refreshDiskFiles() {
+    setState(() {
+      int index = _currPath.lastIndexOf('/');
 
+      if (_currPath.length == 1) listOfDiskFiles = _rootPathFilesDir;
+      if (_currPath.length > 1) listOfDiskFiles = _subPathFilesDir;
+      if (index > 0) listOfDiskFiles = _emptyDir;
+
+      print(listOfDiskFiles);
+    });
   }
+
+  _onDiskFileTap(DiskFile file) {
+    if (file.isDir == 0) return;
+    _title = file.serverFilename;
+    _currPath = file.path;
+    _refreshDiskFiles();
+  }
+
   @override
   void initState() {
-    listofDiskFiles = _rootPathFilesDir;
+    listOfDiskFiles = _rootPathFilesDir;
     super.initState();
   }
 
@@ -114,11 +135,12 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: [
             Container(
-              height: 35,
+              margin: EdgeInsets.only(top: 10),
+              height: 45,
               child: SearchInputWidget(
                   _onSubmittedSearchInputWidget, _onFocusSearchInputWidget),
             ),
-            Center(child: FileListWidget(listofDiskFiles,_onDiskFileTap))
+            Center(child: FileListWidget(listOfDiskFiles, _onDiskFileTap))
           ],
         ),
       ),

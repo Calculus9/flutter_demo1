@@ -7,7 +7,8 @@ typedef OnDiskFileTapCallback = void Function(DiskFile file);
 class FileListWidget extends StatelessWidget {
   List<DiskFile> _listOfDiskFiles;
   OnDiskFileTapCallback _diskFileTapCallback;
-  FileListWidget(this._listOfDiskFiles, _diskFileTapCallback);
+  
+  FileListWidget(this._listOfDiskFiles, this._diskFileTapCallback);
 
   Widget _buildFolderItem(BuildContext context, DiskFile file) {
     return InkWell(
