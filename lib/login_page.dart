@@ -96,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
         children: <Widget>[
           Image.asset("assets/baiduLogo.png"),
           Text(
-            "欢迎登录百度用户",
+            "欢迎登录百度网盘",
             style: _biggerFont,
           ),
         ],

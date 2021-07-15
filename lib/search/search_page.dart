@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_demo1/search_input_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_demo1/search/search_input_widget.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -16,34 +16,34 @@ class _SearchPageState extends State<SearchPage> {
 
   List<SearchHistoryWidget> widgetList = new List(); // 存储SearchHistoryWidget的列表
 
-  @override
-  void initState() {
-    // 读取本地存储的历史记录 并显示
-    _getHistory();
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   // 读取本地存储的历史记录 并显示
+  //   _getHistory();
+  //   super.initState();
+  // }
+  //
+  // @override
+  // void dispose() {
+  //   print("组件销毁");
+  //   _saveHistory();
+  //   super.dispose();
+  // }
 
-  @override
-  void dispose() {
-    print("组件销毁");
-    _saveHistory();
-    super.dispose();
-  }
-
-  //获取本地存储的历史记录
-  void _getHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      hisList = prefs.getStringList('hisList') ?? [];
-      showHistory(hisList);
-    });
-  }
-
-  //将当前的历史记录存储进本地
-  void _saveHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList("hisList", hisList);
-  }
+  // //获取本地存储的历史记录
+  // void _getHistory() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   setState(() {
+  //     hisList = prefs.getStringList('hisList') ?? [];
+  //     showHistory(hisList);
+  //   });
+  // }
+  //
+  // //将当前的历史记录存储进本地
+  // void _saveHistory() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   prefs.setStringList("hisList", hisList);
+  // }
 
   // 搜索框提交事件
   void _onSubmittedSearch(value) {

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_demo1/search_input_widget.dart';
-import 'package:flutter_demo1/search_page.dart';
+import 'package:flutter_demo1/search/search_input_widget.dart';
+import 'package:flutter_demo1/search/search_page.dart';
 import 'package:flutter_demo1/utils.dart';
 
 import 'disk_file.dart';

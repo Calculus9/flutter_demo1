@@ -121,7 +121,7 @@ class _PersonalCenterState extends State<PersonalCenter> {
         child: Column(
           children: [
             SizedBox(
-              height: 25.0,
+              height: 60.0,
             ),
             _personalHeader(),
             SizedBox(

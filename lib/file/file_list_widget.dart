@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo1/disk_file.dart';
+import 'package:flutter_demo1/file/disk_file.dart';
+import 'package:flutter_demo1/utils.dart';
 
 // ignore: must_be_immutable
 typedef OnDiskFileTapCallback = void Function(DiskFile file);
@@ -19,7 +20,7 @@ class FileListWidget extends StatelessWidget {
           title: Row(
             children: [Expanded(child: Text(file.serverFilename))],
           ),
-          subtitle: Text(file.serverCtime.toString()),
+          subtitle: Text("${Utils.getDateTime(file.serverCtime)}"),
           trailing: Icon(Icons.chevron_right),
         ),
       ),
@@ -36,7 +37,7 @@ class FileListWidget extends StatelessWidget {
           title: Row(
             children: [Expanded(child: Text(file.serverFilename))],
           ),
-          subtitle: Text(file.serverCtime.toString()),
+          subtitle: Text("${Utils.getDateTime(file.serverCtime)}"+" "+"${Utils.getFileSize(file.size)}")
         ),
       ),
       onTap: () => _diskFileTapCallback(file),
