@@ -1,7 +1,169 @@
+// import 'package:flutter/cupertino.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_demo1/datebase_helper.dart';
+// import 'package:flutter_demo1/file/disk_file.dart';
+// import 'package:flutter_demo1/file/file_store.dart';
+// import 'package:flutter_demo1/search/search_history.dart';
+// import 'package:flutter_demo1/search/search_history_widget.dart';
+//
+// class SearchPage extends StatefulWidget {
+//   DbHelper searchHistoryProvider = DbHelper.instance;
+//   FileStore fileStore;
+//   String currPath;
+//
+//   SearchPage(this.fileStore, {this.currPath});
+//   @override
+//   _SearchPageState createState() => _SearchPageState();
+// }
+//
+// enum SearchState { typeing, loading, done, empty, fail }
+//
+// class _SearchPageState extends State<SearchPage> {
+//   List<SearchHistory> _historyWords = [];
+//   var _searchKeyword;
+//   var _searchState = SearchState.typeing;
+//   List<DiskFile> _searchResult = [];
+//
+//   void _onSearchHistoryEvent(SearchHistoryEvent event, SearchHistory history) {
+//     switch (event) {
+//       case SearchHistoryEvent.insert:
+//         widget.searchHistoryProvider
+//             .insert(history)
+//             .then((value) => setState(() {
+//                   history.id = value;
+//                   _historyWords.insert(0, history);
+//                 }))
+//             .catchError((e) {});
+//         break;
+//       case SearchHistoryEvent.delete:
+//         widget.searchHistoryProvider
+//             .delete(history.id)
+//             .then((value) => setState(() => _historyWords.remove(history)));
+//         break;
+//       case SearchHistoryEvent.clear:
+//         widget.searchHistoryProvider
+//             .deleteAll()
+//             .then((value) => setState(() => _historyWords.clear()));
+//         break;
+//       case SearchHistoryEvent.search:
+//         _onSubmittedSearchWord(history.keyword);
+//     }
+//   }
+//
+//   @override
+//   void initState() {
+//     widget.searchHistoryProvider
+//         .queryAll()
+//         .then((list) => setState(() => _historyWords = list));
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       body: Container(
+//         margin: EdgeInsets.only(top: 40),
+//         padding: EdgeInsets.only(left: 16, right: 16),
+//         child: Column(
+//           children: <Widget>[
+//             _buildSearchInput(),
+//             Container(height: 15),
+//             _buildPageBody(),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+//
+//   Widget _buildPageBody() {
+//     switch (_searchState) {
+//       case SearchState.typeing:
+//         return _buildSearchHistory();
+//       case SearchState.loading:
+//         return _buildLoadingWidget();
+//       case SearchState.done:
+//         return _buildSearchResult();
+//       case SearchState.fail:
+//       case SearchState.empty:
+//         return null;
+//     }
+//   }
+//
+//   void _onSubmittedSearchWord(String value) {
+//     value = value.trim();
+//     if (value.isEmpty) return;
+//     setState(() => _searchState = SearchState.loading);
+//   }
+//
+//   void _onOpenFile(DiskFile file) {
+//     if (0 == file.isDir) return;
+//   }
+//
+//   void _onSearchTextChanged(String value) {
+//     setState(() {
+//       _searchKeyword = value.trim();
+//       _searchState = SearchState.typeing;
+//     });
+//   }
+//
+//   Widget _buildSearchHistory() {
+//     return Expanded(
+//         child: Column(
+//       children: <Widget>[
+//         Row(
+//           children: <Widget>[
+//             Text(
+//               "搜索历史",
+//               style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w600),
+//             )
+//           ],
+//         ),
+//         Expanded(
+//             child: SearchHistoryWidget(
+//           _historyWords,
+//           searchKeyWord: _searchKeyword,
+//           eventCallback: _onSearchHistoryEvent,
+//         ))
+//       ],
+//     ));
+//   }
+//
+//   Widget _buildLoadingWidget() {
+//     return Center(
+//       heightFactor: 6,
+//       child: Column(
+//         children: <Widget>[
+//           CircularProgressIndicator(
+//             strokeWidth: 4.0,
+//           ),
+//           Text("正在搜索")
+//         ],
+//       ),
+//     );
+//   }
+//
+//   Widget _buildSearchResult() {
+//     return Expanded(
+//         child: Column(
+//       children: <Widget>[
+//         Row(
+//           children: <Widget>[
+//             Text(
+//               "搜索结果(${_searchResult.length})",
+//               style: TextStyle(color: Colors.blue, fontSize: 12),
+//             )
+//           ],
+//         ),
+//       ],
+//     ));
+//   }
+//   Widget _buildSearchInput()
+// }
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_demo1/search/search_history_widget.dart';
 import 'package:flutter_demo1/search/search_input_widget.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -16,34 +178,33 @@ class _SearchPageState extends State<SearchPage> {
 
   List<SearchHistoryWidget> widgetList = new List(); // 存储SearchHistoryWidget的列表
 
-  // @override
-  // void initState() {
-  //   // 读取本地存储的历史记录 并显示
-  //   _getHistory();
-  //   super.initState();
-  // }
-  //
-  // @override
-  // void dispose() {
-  //   print("组件销毁");
-  //   _saveHistory();
-  //   super.dispose();
-  // }
+  @override
+  void initState() {
+    // 读取本地存储的历史记录 并显示
+    _getHistory();
+    super.initState();
+  }
 
-  // //获取本地存储的历史记录
-  // void _getHistory() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     hisList = prefs.getStringList('hisList') ?? [];
-  //     showHistory(hisList);
-  //   });
-  // }
-  //
-  // //将当前的历史记录存储进本地
-  // void _saveHistory() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   prefs.setStringList("hisList", hisList);
-  // }
+  @override
+  void dispose() {
+    _saveHistory();
+    super.dispose();
+  }
+
+  //获取本地存储的历史记录
+  void _getHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      hisList = prefs.getStringList('hisList') ?? [];
+      showHistory(hisList);
+    });
+  }
+
+  //将当前的历史记录存储进本地
+  void _saveHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList("hisList", hisList);
+  }
 
   // 搜索框提交事件
   void _onSubmittedSearch(value) {
@@ -97,7 +258,6 @@ class _SearchPageState extends State<SearchPage> {
               style: TextStyle(fontSize: 16.0, color: Colors.blue),
             ),
             onTap: () {
-              print("清空历史记录");
               setState(() {
                 hisList.clear();
                 widgetList.clear();
@@ -180,55 +340,3 @@ class _SearchPageState extends State<SearchPage> {
 
 typedef DeleteWidgetCallback = void Function(SearchHistoryWidget widget);
 
-//自定义历史记录组件
-class SearchHistoryWidget extends StatefulWidget {
-  final String title;
-
-  final DeleteWidgetCallback deleteWidget;
-
-  //实现删除组件的功能，key是必要的
-  SearchHistoryWidget(Key key, {this.title, @required this.deleteWidget})
-      : super(key: key);
-
-  @override
-  _SearchHistoryWidgetState createState() =>
-      _SearchHistoryWidgetState(this.title);
-}
-
-class _SearchHistoryWidgetState extends State<SearchHistoryWidget> {
-  String title;
-
-  _SearchHistoryWidgetState(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: InkWell(
-        onTap: () {
-          print(this.title);
-        },
-        child: Row(
-          children: [
-            Container(
-              child: IconButton(
-                icon: Icon(Icons.restore),
-                onPressed: () {},
-              ),
-            ),
-            Expanded(
-              child: Text(this.title),
-            ),
-            Container(
-              child: IconButton(
-                icon: Icon(Icons.delete),
-                onPressed: () {
-                  widget.deleteWidget(widget);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

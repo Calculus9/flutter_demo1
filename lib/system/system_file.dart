@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_demo1/file/disk_file.dart';
 
 class SystemFile extends DiskFile {
+  // 继承diskFile
   SystemFile.fromSystem(FileSystemEntity file) {
     FileStat fileStat = file.statSync();
     int timestamp = fileStat.modified.toLocal().millisecondsSinceEpoch ~/ 1000;

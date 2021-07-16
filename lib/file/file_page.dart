@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_demo1/file/file_store.dart';
 import 'package:flutter_demo1/search/search_input_widget.dart';
 import 'package:flutter_demo1/search/search_page.dart';
-import 'package:flutter_demo1/system_file_store.dart';
+import 'package:flutter_demo1/system/system_file_store.dart';
 import 'package:flutter_demo1/utils.dart';
 
 import 'disk_file.dart';
@@ -19,6 +19,8 @@ class FilePage extends StatefulWidget {
   _FilePageState createState() => _FilePageState();
 }
 
+enum FilesState { loading, loaded, fail }
+
 class _FilePageState extends State<FilePage> {
   /// 文件列表
   List<DiskFile> listOfDiskFiles = [];
@@ -28,6 +30,17 @@ class _FilePageState extends State<FilePage> {
 
   String _title = '根目录';
   String _currPath = '/';
+  String _failMsg = "";
+
+  FilesState _filesState = FilesState.loaded;
+
+  @override
+  Future<void> initState() {
+    _currPath = '/storage/emulated/0';
+    _refreshDiskFiles();
+
+    super.initState();
+  }
 
   /// 搜索框被点击
   _onFocusSearchInputWidget() {
@@ -40,8 +53,34 @@ class _FilePageState extends State<FilePage> {
   /// 提交搜索框内容
   _onSubmittedSearchInputWidget(String keyword) {}
 
+  Widget _cancel() {
+    // ignore: deprecated_member_use
+    return FlatButton(
+      color: Colors.blue,
+      child: Text(
+        "取消",
+      ),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+  }
+
   /// 刷新磁盘文件
   _refreshDiskFiles() {
+    if (_currPath.length <= "/storage/emulated".length) {
+      return showDialog(
+          context: this.context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text("系统提醒"),
+              content: Text("无法返回"),
+              actions: <Widget>[
+                _cancel(),
+              ],
+            );
+          });
+    }
     widget._fileStore.listFiles(_currPath).then((files) {
       setState(() {
         listOfDiskFiles = files;
@@ -62,14 +101,6 @@ class _FilePageState extends State<FilePage> {
     _title = file.serverFilename;
     _currPath = file.path;
     _refreshDiskFiles();
-  }
-
-  @override
-  void initState() {
-    _currPath = '/storage/emulated/0';
-    _refreshDiskFiles();
-
-    super.initState();
   }
 
   @override
