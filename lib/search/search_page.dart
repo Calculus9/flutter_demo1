@@ -127,7 +127,7 @@ class _SearchPageState extends State<SearchPage> {
               style: TextStyle(color: Colors.blue, fontSize: 20.0),
             ),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.of(context).pop();
             },
           ),
         )

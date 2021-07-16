@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_demo1/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'main.dart';
 
@@ -20,10 +22,23 @@ class _LoginPageState extends State<LoginPage> {
   ///attribute
   bool _obsecureText = true;
   bool _isEnableLogin = false;
-  String _accountText = "";
-  String _pwdText = "";
 
-  // 提示框
+  //控制账户和密码的输入，获取其内容
+  final accountController = TextEditingController();
+  final pwdController = TextEditingController();
+  //获取，将数据持久化到磁盘中
+  Future<SharedPreferences> _pres = SharedPreferences.getInstance();
+
+  @override
+  void initState() {
+    _pres.then((d) {
+      accountController.text = d.getString(User.accountKey);
+      pwdController.text = d.getString(User.passwordKey);
+      _checkUserInput();
+    });
+    super.initState();
+  } // 提示框
+
   // 1.确认按钮
   Widget _confirm() {
     // ignore: deprecated_member_use
@@ -57,27 +72,34 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  ///按钮控件
-  _getLoginButtomPressed() {
+  ///登录按钮
+  _getLoginButtonPressed() {
     if (!_isEnableLogin) return null;
-    return () {
+
+    return () async {
       showDialog(
           context: this.context,
           builder: (context) {
             return AlertDialog(
               title: Text("登录提醒"),
-              content: Text("登录账户:$_accountText \n登录密码： $_pwdText"),
+              content: Text(
+                  "登录账户:${accountController.text} \n登录密码： ${pwdController.text}"),
               actions: <Widget>[
                 _confirm(),
                 _cancel(),
               ],
             );
           });
+      //写入时可以不是异步的，但是读取必须等待其读取完成
+      final SharedPreferences pres = await _pres;
+      pres.setString(User.accountKey, accountController.text);
+      pres.setString(User.passwordKey, pwdController.text);
     };
   }
 
+  /// 检查用户输入
   void _checkUserInput() {
-    if (_accountText.isNotEmpty && _pwdText.isNotEmpty) {
+    if (accountController.text.isNotEmpty && pwdController.text.isNotEmpty) {
       if (_isEnableLogin) return;
     } else {
       if (!_isEnableLogin) return;
@@ -87,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  /// 顶部
+  /// 渲染顶部
   Widget _buildTop() {
     return Container(
       margin: EdgeInsets.only(top: 30),
@@ -104,13 +126,13 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  /// 账户输入框
+  /// 渲染账户输入框
   Widget _buildAccountEditTextField() {
     return Container(
-      margin: EdgeInsets.only(top: 20,left: 25,right: 25),
+      margin: EdgeInsets.only(top: 20, left: 25, right: 25),
       child: TextField(
+        controller: accountController,
         onChanged: (text) => {
-          _accountText = text,
           _checkUserInput(),
         },
         decoration: InputDecoration(
@@ -125,13 +147,13 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  ///密码输入框
+  /// 渲染密码输入框
   Widget _buildPwdEditTextField() {
     return Container(
-      margin: EdgeInsets.only(top: 20,left: 25,right: 25),
+      margin: EdgeInsets.only(top: 20, left: 25, right: 25),
       child: TextField(
+        controller: pwdController,
         onChanged: (text) => {
-          _pwdText = text,
           _checkUserInput(),
         },
         style: _normalFont,
@@ -157,10 +179,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  /// 登录按钮
+  /// 渲染登录按钮
   Widget _buildButtonLogin() {
     return Container(
-        margin: EdgeInsets.only(top: 20,left: 25,right: 25),
+        margin: EdgeInsets.only(top: 20, left: 25, right: 25),
         width: MediaQuery.of(context).size.width,
         height: 45,
         // ignore: deprecated_member_use
@@ -174,7 +196,7 @@ class _LoginPageState extends State<LoginPage> {
           textColor: Colors.white,
           disabledTextColor: Colors.black12,
           shape: RoundedRectangleBorder(borderRadius: _borderRadius),
-          onPressed: _getLoginButtomPressed(),
+          onPressed: _getLoginButtonPressed(),
         ));
   }
 
@@ -184,8 +206,12 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       //脚手架
       appBar: AppBar(
-        title: Text("登录"),
+        title: Text(
+          "登录",
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
+        backgroundColor: Colors.blue,
       ),
       body: Container(
         margin: EdgeInsets.only(left: 25, right: 25),

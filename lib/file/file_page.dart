@@ -1,13 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_demo1/file/file_store.dart';
 import 'package:flutter_demo1/search/search_input_widget.dart';
 import 'package:flutter_demo1/search/search_page.dart';
+import 'package:flutter_demo1/system_file_store.dart';
 import 'package:flutter_demo1/utils.dart';
 
 import 'disk_file.dart';
 import 'file_list_widget.dart';
 
 class FilePage extends StatefulWidget {
+  FileStore _fileStore = SystemFileStore();
+
+  FilePage({FileStore fileStore}) {
+    if (fileStore != null) _fileStore = fileStore;
+  }
   @override
   _FilePageState createState() => _FilePageState();
 }
@@ -15,55 +22,6 @@ class FilePage extends StatefulWidget {
 class _FilePageState extends State<FilePage> {
   /// 文件列表
   List<DiskFile> listOfDiskFiles = [];
-
-  /// 根目录
-  final _rootPathFilesDir = [
-    DiskFile(
-      path: '/实验室一',
-      serverFilename: '实验一',
-      serverCtime: Utils.currentTimeSeconds(),
-    ),
-    DiskFile(
-      path: '/实验室二',
-      serverFilename: '实验二',
-      serverCtime: Utils.currentTimeSeconds(),
-    ),
-    DiskFile(
-      path: '/实验室三',
-      serverFilename: '实验三',
-      serverCtime: Utils.currentTimeSeconds(),
-    ),
-    DiskFile(
-        path: '/第一讲.pptx',
-        serverFilename: '第一讲.pptx',
-        serverCtime: Utils.currentTimeSeconds(),
-        isDir: 0,
-        category: 4,
-        size: 989),
-    DiskFile(
-        path: '/第二讲.pptx',
-        serverFilename: '第二讲.pptx',
-        serverCtime: Utils.currentTimeSeconds(),
-        isDir: 0,
-        category: 4,
-        size: 9839),
-  ];
-
-  /// 子目录
-  final _subPathFilesDir = [
-    DiskFile(
-      path: '/实验室一/源代码',
-      serverFilename: '源代码',
-      serverCtime: Utils.currentTimeSeconds(),
-    ),
-    DiskFile(
-        path: '/实验室一/实验指导书. pdf',
-        serverFilename: '实验指导书. pdf',
-        serverCtime: Utils.currentTimeSeconds(),
-        isDir: 0,
-        category: 4,
-        size: 983),
-  ];
 
   /// 空文件夹
   final List<DiskFile> _emptyDir = [];
@@ -82,14 +40,12 @@ class _FilePageState extends State<FilePage> {
   /// 提交搜索框内容
   _onSubmittedSearchInputWidget(String keyword) {}
 
-  /// 更新磁盘文件
+  /// 刷新磁盘文件
   _refreshDiskFiles() {
-    setState(() {
-      int index = _currPath.lastIndexOf('/');
-
-      if (_currPath.length == 1) listOfDiskFiles = _rootPathFilesDir;
-      if (_currPath.length > 1) listOfDiskFiles = _subPathFilesDir;
-      if (index > 0) listOfDiskFiles = _emptyDir;
+    widget._fileStore.listFiles(_currPath).then((files) {
+      setState(() {
+        listOfDiskFiles = files;
+      });
     });
   }
 
@@ -110,7 +66,9 @@ class _FilePageState extends State<FilePage> {
 
   @override
   void initState() {
-    listOfDiskFiles = _rootPathFilesDir;
+    _currPath = '/storage/emulated/0';
+    _refreshDiskFiles();
+
     super.initState();
   }
 

@@ -12,6 +12,7 @@ class FileListWidget extends StatelessWidget {
 
   FileListWidget(this._listOfDiskFiles, this._diskFileTapCallback);
 
+  // 渲染文件夹
   Widget _buildFolderItem(BuildContext context, DiskFile file) {
     return InkWell(
       child: Container(
@@ -28,6 +29,7 @@ class FileListWidget extends StatelessWidget {
     );
   }
 
+  // 渲染文件item
   Widget _buildFileItem(BuildContext context, DiskFile file) {
     // 水波纹
     return InkWell(

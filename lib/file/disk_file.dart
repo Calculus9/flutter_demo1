@@ -24,4 +24,10 @@ class DiskFile {
       this.size = 0,
       this.isDir = 1,
       this.category = 6});
+  @override
+  String toString() {
+    return 'DiskFile{path: $path, serverFilename: $serverFilename, '
+        'isDir: $isDir, serverCtime: $serverCtime, size: $size,'
+        ' category: $category}';
+  }
 }
