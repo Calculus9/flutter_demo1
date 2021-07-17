@@ -11,8 +11,8 @@ import 'file_list_widget.dart';
 
 class FilePage extends StatefulWidget {
   FileStore _fileStore = SystemFileStore();
-
-  FilePage({FileStore fileStore}) {
+  String rootpath;
+  FilePage({FileStore fileStore,this.rootpath = '/storage/emulated/0'}) {
     if (fileStore != null) _fileStore = fileStore;
   }
   @override
@@ -36,7 +36,7 @@ class _FilePageState extends State<FilePage> {
 
   @override
   Future<void> initState() {
-    _currPath = '/storage/emulated/0';
+    _currPath = widget.rootpath;
     _refreshDiskFiles();
 
     super.initState();

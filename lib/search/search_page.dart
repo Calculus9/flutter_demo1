@@ -1,228 +1,100 @@
-// import 'package:flutter/cupertino.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_demo1/datebase_helper.dart';
-// import 'package:flutter_demo1/file/disk_file.dart';
-// import 'package:flutter_demo1/file/file_store.dart';
-// import 'package:flutter_demo1/search/search_history.dart';
-// import 'package:flutter_demo1/search/search_history_widget.dart';
-//
-// class SearchPage extends StatefulWidget {
-//   DbHelper searchHistoryProvider = DbHelper.instance;
-//   FileStore fileStore;
-//   String currPath;
-//
-//   SearchPage(this.fileStore, {this.currPath});
-//   @override
-//   _SearchPageState createState() => _SearchPageState();
-// }
-//
-// enum SearchState { typeing, loading, done, empty, fail }
-//
-// class _SearchPageState extends State<SearchPage> {
-//   List<SearchHistory> _historyWords = [];
-//   var _searchKeyword;
-//   var _searchState = SearchState.typeing;
-//   List<DiskFile> _searchResult = [];
-//
-//   void _onSearchHistoryEvent(SearchHistoryEvent event, SearchHistory history) {
-//     switch (event) {
-//       case SearchHistoryEvent.insert:
-//         widget.searchHistoryProvider
-//             .insert(history)
-//             .then((value) => setState(() {
-//                   history.id = value;
-//                   _historyWords.insert(0, history);
-//                 }))
-//             .catchError((e) {});
-//         break;
-//       case SearchHistoryEvent.delete:
-//         widget.searchHistoryProvider
-//             .delete(history.id)
-//             .then((value) => setState(() => _historyWords.remove(history)));
-//         break;
-//       case SearchHistoryEvent.clear:
-//         widget.searchHistoryProvider
-//             .deleteAll()
-//             .then((value) => setState(() => _historyWords.clear()));
-//         break;
-//       case SearchHistoryEvent.search:
-//         _onSubmittedSearchWord(history.keyword);
-//     }
-//   }
-//
-//   @override
-//   void initState() {
-//     widget.searchHistoryProvider
-//         .queryAll()
-//         .then((list) => setState(() => _historyWords = list));
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Container(
-//         margin: EdgeInsets.only(top: 40),
-//         padding: EdgeInsets.only(left: 16, right: 16),
-//         child: Column(
-//           children: <Widget>[
-//             _buildSearchInput(),
-//             Container(height: 15),
-//             _buildPageBody(),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-//
-//   Widget _buildPageBody() {
-//     switch (_searchState) {
-//       case SearchState.typeing:
-//         return _buildSearchHistory();
-//       case SearchState.loading:
-//         return _buildLoadingWidget();
-//       case SearchState.done:
-//         return _buildSearchResult();
-//       case SearchState.fail:
-//       case SearchState.empty:
-//         return null;
-//     }
-//   }
-//
-//   void _onSubmittedSearchWord(String value) {
-//     value = value.trim();
-//     if (value.isEmpty) return;
-//     setState(() => _searchState = SearchState.loading);
-//   }
-//
-//   void _onOpenFile(DiskFile file) {
-//     if (0 == file.isDir) return;
-//   }
-//
-//   void _onSearchTextChanged(String value) {
-//     setState(() {
-//       _searchKeyword = value.trim();
-//       _searchState = SearchState.typeing;
-//     });
-//   }
-//
-//   Widget _buildSearchHistory() {
-//     return Expanded(
-//         child: Column(
-//       children: <Widget>[
-//         Row(
-//           children: <Widget>[
-//             Text(
-//               "搜索历史",
-//               style: TextStyle(color: Colors.blue, fontWeight: FontWeight.w600),
-//             )
-//           ],
-//         ),
-//         Expanded(
-//             child: SearchHistoryWidget(
-//           _historyWords,
-//           searchKeyWord: _searchKeyword,
-//           eventCallback: _onSearchHistoryEvent,
-//         ))
-//       ],
-//     ));
-//   }
-//
-//   Widget _buildLoadingWidget() {
-//     return Center(
-//       heightFactor: 6,
-//       child: Column(
-//         children: <Widget>[
-//           CircularProgressIndicator(
-//             strokeWidth: 4.0,
-//           ),
-//           Text("正在搜索")
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget _buildSearchResult() {
-//     return Expanded(
-//         child: Column(
-//       children: <Widget>[
-//         Row(
-//           children: <Widget>[
-//             Text(
-//               "搜索结果(${_searchResult.length})",
-//               style: TextStyle(color: Colors.blue, fontSize: 12),
-//             )
-//           ],
-//         ),
-//       ],
-//     ));
-//   }
-//   Widget _buildSearchInput()
-// }
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_demo1/datebase_helper.dart';
+import 'package:flutter_demo1/file/disk_file.dart';
+import 'package:flutter_demo1/file/file_list_widget.dart';
+import 'package:flutter_demo1/file/file_page.dart';
+import 'package:flutter_demo1/file/file_store.dart';
+import 'package:flutter_demo1/search/search_history.dart';
 import 'package:flutter_demo1/search/search_history_widget.dart';
 import 'package:flutter_demo1/search/search_input_widget.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_demo1/system/system_file_store.dart';
+
+enum SearchState { typing, loading, fail, done, empty }
 
 class SearchPage extends StatefulWidget {
+  //用于搜索文件
+  FileStore _fileStore = SystemFileStore();
   @override
   _SearchPageState createState() => _SearchPageState();
 }
 
 class _SearchPageState extends State<SearchPage> {
-  TextEditingController _textController =
-      TextEditingController(); // 文本控制器  用于清空文本框
+  //数据库
+  DbHelper provider = DbHelper.instance;
 
-  List<String> hisList = new List(); // 存储历史记录的列表
+  List<SearchHistory> historyList = [];
 
-  List<SearchHistoryWidget> widgetList = new List(); // 存储SearchHistoryWidget的列表
+  // 文本控制器  用于清空文本框
+  TextEditingController _textController = TextEditingController();
+
+  // 存储SearchHistoryWidget的列表
+  List<SearchHistoryWidget> widgetList = [];
+
+  List<DiskFile> _diskFiles = [];
+
+  //状态
+  var _state = SearchState.typing;
 
   @override
   void initState() {
-    // 读取本地存储的历史记录 并显示
-    _getHistory();
+    //查询所有
+    Future<List<SearchHistory>> listHistoryFuture = provider.queryAll();
+    // 将查询到的list展示
+    listHistoryFuture.then((value) {
+      setState(() {
+        this.historyList = value;
+        showHistory(value);
+      });
+    });
+    _state = SearchState.typing;
     super.initState();
   }
 
-  @override
-  void dispose() {
-    _saveHistory();
-    super.dispose();
-  }
-
-  //获取本地存储的历史记录
-  void _getHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      hisList = prefs.getStringList('hisList') ?? [];
-      showHistory(hisList);
-    });
-  }
-
-  //将当前的历史记录存储进本地
-  void _saveHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList("hisList", hisList);
-  }
-
   // 搜索框提交事件
+  //搜索框提交事件后，当前searchState切换为loading
   void _onSubmittedSearch(value) {
+    if (value == '') return;
+    setState(() {
+      _state = SearchState.loading;
+    });
+    _textController.clear(); // 清空文本框
+
     //搜索文件
     searchFile(value);
     //添加到历史记录
-    addToHistory(value);
+    SearchHistory tmp = SearchHistory(value);
+    tmp.id = DateTime.now().millisecondsSinceEpoch;
+    tmp.time = DateTime.now().millisecondsSinceEpoch;
+    setState(() {
+      _textController.clear(); // 清空文本框
+      historyList.add(tmp);
+    });
+    //添加到数据库
+    provider.deleteAll();
+    showHistory(historyList); // 展示列表文件
+    historyList.forEach((element) async {
+      await provider.insert(element);
+    });
   }
 
   // 文件搜索
-  void searchFile(value) {}
-
-  // 添加到历史记录
-  void addToHistory(value) {
+  void searchFile(value) {
     setState(() {
-      _textController.clear(); // 清空文本框
-      hisList.add(value);
-      showHistory(hisList); // 展示列表文件
+      _state = SearchState.loading;
+    });
+    // 搜索本地文件里面是否包含，之根据搜索所有本地文件去找
+    widget._fileStore
+        .search(value, path: '/storage/emulated/0', recursion: 1)
+        .then((files) {
+      setState(() {
+        _diskFiles = files;
+        _state = SearchState.done;
+      });
+    }).catchError((error) {
+      setState(() {
+        _state = SearchState.fail;
+      });
     });
   }
 
@@ -232,13 +104,17 @@ class _SearchPageState extends State<SearchPage> {
     list.forEach((element) {
       widgetList.add(SearchHistoryWidget(
         UniqueKey(),
-        title: element,
+        title: element.keyword,
         deleteWidget: (v) {
           //v 是待删除组件的title
           setState(() {
-            hisList.remove(v.title);
-            print(hisList);
-            showHistory(hisList);
+            for (int i = 0; i < historyList.length; i++) {
+              if (historyList[i].keyword == v.title) {
+                historyList.removeAt(i);
+                break;
+              }
+            }
+            showHistory(historyList);
           });
         },
       ));
@@ -259,7 +135,7 @@ class _SearchPageState extends State<SearchPage> {
             ),
             onTap: () {
               setState(() {
-                hisList.clear();
+                // hisList.clear();
                 widgetList.clear();
               });
             },
@@ -295,6 +171,73 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
+  //加载页面
+  Widget _buildLoading() {
+    return SingleChildScrollView(
+      child: Column(
+        children: <Widget>[
+          SizedBox(height: 300),
+          CircularProgressIndicator(strokeWidth: 4.0),
+          Text("正在加载")
+        ],
+      ),
+    );
+  }
+
+  void _onDiskFileTap(DiskFile file) {
+    //打开文件
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => FilePage(rootpath: file.path)));
+  }
+
+  /// 根据搜索切换不同的状态
+  Widget _buildPageBody() {
+    switch (_state) {
+      // 搜索的时候显示之前的搜索历史
+      case SearchState.typing:
+        return _searchHistoryBody();
+      case SearchState.loading:
+        return _buildLoading();
+      case SearchState.done:
+        return SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              ListTile(
+                title: Text(
+                  "搜索结果 (${_diskFiles.length})",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Container(
+                height: 300,
+                child: FileListWidget(_diskFiles, _onDiskFileTap),
+              ),
+            ],
+          ),
+        );
+
+      case SearchState.fail:
+      case SearchState.empty:
+        return Column(
+          children: <Widget>[
+            SizedBox(height: 200),
+            IconButton(
+              icon: Icon(Icons.refresh),
+              iconSize: 96,
+              onPressed: () {
+                print("SearchState.fail");
+              },
+            ),
+            Text("搜索失败")
+          ],
+        );
+      default:
+        return _searchHistoryBody();
+    }
+  }
+
   // 搜索历史文本框
   Widget _searchHistoryText() {
     return Container(
@@ -321,22 +264,17 @@ class _SearchPageState extends State<SearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Container(
-      child: Column(children: [
-        SizedBox(
-          height: 25,
-        ),
-        _searchTextField(),
-        SizedBox(
-          height: 10,
-        ),
-        _searchHistoryText(),
-        _searchHistoryBody(),
-        Spacer(), // 相当于弹簧效果,只有在不可以滑动的时候,弹簧才有效果
-        _clearHistoryText(),
-      ]),
+      child: SingleChildScrollView(
+        child: Column(children: [
+          SizedBox(
+            height: 25,
+          ),
+          _searchTextField(),
+          _buildPageBody()
+        ]),
+      ),
     ));
   }
 }
 
 typedef DeleteWidgetCallback = void Function(SearchHistoryWidget widget);
-

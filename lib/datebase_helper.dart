@@ -8,46 +8,46 @@ import 'package:sqflite/sqflite.dart';
 class DbHelper {
   DbHelper._privateConstructor();
 
-  static final DbHelper _instance = DbHelper._privateConstructor();
-
-  static DbHelper get instance => _instance;
+  static final DbHelper instance = DbHelper._privateConstructor();
 
   factory DbHelper() {
-    return _instance;
+    return instance;
   }
 
   Database _db;
+
   Future<Database> get db async {
+    // ignore: unnecessary_null_comparison
     if (_db == null) _db = await initDb();
     return _db;
   }
 
   Future<Database> initDb() async {
-// 获取数据库文件的存储路径
     var dbPath = await getDatabasesPath();
     var path = PathUtils.join(dbPath, User.dbName);
-    return await openDatabase(path, version: User.dbVersion);
+    return await openDatabase(path,
+        version: User.dbVersion, onCreate: _onCreate);
   }
 
-//根据数据库文件路径和数据库版本号创建数据库表
-  Future<void> _onCreate(Database db, int version) {
-    User.sqlCreateTables.forEach((sql) {
-      db.execute(sql);
-    });
+  FutureOr<void> _onCreate(Database db, int version) {
+    User.sqlCreateTables.forEach((sql) => db.execute(sql));
   }
 
   Future<void> close() {
-    if (_db != null) return _db.close();
+    if (_db != null) {
+      return _db.close();
+    }
     return null;
   }
 
-  //增加
+  //插入
   Future<SearchHistory> insert(SearchHistory searchHistory) async {
     var database = await db;
 
     try {
       searchHistory.id =
           await database.insert(User.searchHistoryTable, searchHistory.toMap());
+      print("id: ${searchHistory.id}");
     } catch (e) {
       print(e);
     }
@@ -57,25 +57,35 @@ class DbHelper {
   //查询所有
   Future<List<SearchHistory>> queryAll() async {
     var database = await db;
-    var listOfObjs = await database.query(User.searchHistoryTable);
-    return listOfObjs.map((map) => SearchHistory.fromMap(map));
+    var listOfObjiects = await database.query(User.searchHistoryTable);
+    var list = <SearchHistory>[];
+    listOfObjiects.forEach((element) {
+      list.add(SearchHistory.fromMap(element));
+    });
+    return list;
   }
 
-  //查询某个
+  //搜索
   Future<List<SearchHistory>> search(String keyword) async {
     var database = await db;
     var listOfObjets = await database.query(User.searchHistoryTable,
         where: 'keyword like %?%', whereArgs: [keyword]);
-    return listOfObjets.map((map) => SearchHistory.fromMap(map));
+    var list = <SearchHistory>[];
+    listOfObjets.forEach((element) {
+      list.add(SearchHistory.fromMap(element));
+    });
+    return list;
   }
 
-//  删除
+  //删除
   Future<bool> delete(int id) async {
     var database = await db;
-    var count = await database.delete(User.searchHistoryTable, where: 'id = ?', whereArgs: [id]);
+    var count = await database
+        .delete(User.searchHistoryTable, where: 'id = ?', whereArgs: [id]);
     return count == 1;
   }
-  //删除所有
+
+  //清空
   Future<int> deleteAll() async {
     var database = await db;
     return await database.delete(User.searchHistoryTable);

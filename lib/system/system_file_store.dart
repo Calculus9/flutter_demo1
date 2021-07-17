@@ -21,25 +21,49 @@ class SystemFileStore implements FileStore {
     });
     return diskFiles;
   }
-  // @override
-  // Future<List<DiskFile>> search(String key,{
-  //   String dir = '/',int recursion = 1,
-  //   int page = 1,int num = 1000
-  // }) {
-  //   Directory directory = Directory(dir);
-  //   List<DiskFile> diskFiles = [];
-  //
-  //   int count = 0;
-  //   int start = (page - 1) * num;
-  //   var listOfFiles = directory.list(recursive: recursion == 1 ? true : false);
-  //   var _diskFilseComplete = Completer();
-  //
-  //   listOfFiles.listen((file) {
-  //     var fileName = PathUtils.basename(file.path);
-  //
-  //     if(file.path == null ||
-  //         (fileName.substring(0,1) == '.'&&
-  //             !AppConfig.instance ))
-  //   });
-  // }
+
+  @override
+  Future<List<DiskFile>> search(String key,
+      {String path = '/',
+      int recursion = 0,
+      int page = 1,
+      int num = 1000}) async {
+    Directory directory = Directory(path);
+    var diskFiles = List<DiskFile>();
+
+    int count = 0;
+    int start = (page - 1) * num;
+    var listOfFiles = directory.list(recursive: recursion == 1 ? true : false);
+    var _diskFilesComplete = Completer();
+
+    listOfFiles.listen(
+      ((file) {
+        var fileName = PathUtils.basename(file.path);
+        print(fileName);
+
+        if (file.path == null ||
+            (fileName.substring(0, 1) == '.' &&
+                !AppConfig.instance.showAllFiles) ||
+            !fileName.toLowerCase().contains(key.toLowerCase()) ||
+            count++ < start) return;
+
+        if (count > (start + num)) {
+          _diskFilesComplete.isCompleted
+              ? null
+              : _diskFilesComplete.complete('');
+          return;
+        }
+
+        diskFiles.add(SystemFile.fromSystem(file));
+      }),
+      onDone: () => _diskFilesComplete.isCompleted
+          ? null
+          : _diskFilesComplete.complete(''),
+      onError: (e) => _diskFilesComplete.completeError(e),
+    );
+
+    await _diskFilesComplete.future;
+
+    return diskFiles;
+  }
 }

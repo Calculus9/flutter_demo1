@@ -8,7 +8,7 @@ class SearchHistory {
   SearchHistory.fromMap(Map<String, dynamic> map) {
     this.keyword = map['keyword'];
     this.id = map['id'];
-    this.time = map['time'];
+    this.time = int.parse(map['time']);
   }
 
   Map<String, dynamic> toMap() => {'keyword': keyword, 'id': id, 'time': time};
