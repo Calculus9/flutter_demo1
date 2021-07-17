@@ -21,24 +21,4 @@ class AppConfig {
 
   String defaultFilesRootPath = '/';
   bool showAllFiles = false;
-
-// void initPlatformFileSystem() {
-//   Platform.isAndroid
-//       ? getExternalStorageDirectory().then((dir) {
-//           int endIndex = dir.path
-//               .indexOf(Constant.defaultExternalStorageDirectoryPrefix);
-//           if (endIndex > -1) {
-//             AppConfig.instance.defaultFilesRootPath =
-//                 dir.path.substring(0, endIndex);
-//           }
-//         })
-//       : getLibraryDirectory().then((dir) {
-//           AppConfig.instance.defaultFilesRootPath = dir.path;
-//         });
-// }
-
-// Future<bool> requestPermissions() async{
-//   Map<PermissionGroup,PermissinStatuc> permissions =
-//       await Permissions
-// }
 }
