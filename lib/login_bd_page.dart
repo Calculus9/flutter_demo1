@@ -110,6 +110,7 @@ class _TempState extends State<Temp> {
           expiresIn: int.parse(expiresIn));
       prefs.setJson(User.keyBdOAuth2Token, token.toJson());
       User.tokenValue = prefs.getJson(User.keyBdOAuth2Token)["access_token"];
+      print(User.tokenValue);
       Navigator.of(context).pop();
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => MyHomePage()));

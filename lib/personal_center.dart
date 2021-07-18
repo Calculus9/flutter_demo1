@@ -11,7 +11,7 @@ class PersonalCenter extends StatefulWidget {
 }
 
 class _PersonalCenterState extends State<PersonalCenter> {
-  var _avatar_url;
+  var _avatar_url = "assets/user-head.jpg";
   var _username, _used, _total, _quota_des;
   var _vip_type;
 
@@ -76,7 +76,7 @@ class _PersonalCenterState extends State<PersonalCenter> {
       width: 300.0,
       child: LinearProgressIndicator(
           backgroundColor: Colors.grey,
-          value: 0.2,
+          value: _used/_total,
           valueColor: new AlwaysStoppedAnimation<Color>(Colors.blue)),
     );
   }
@@ -90,63 +90,6 @@ class _PersonalCenterState extends State<PersonalCenter> {
         style: TextStyle(fontSize: 12.0, color: Colors.grey),
       ),
     );
-  }
-
-  logout() {}
-  change() {}
-  Widget _exit() {
-    var _value = 0;
-    return DropdownButton(
-        value: _value,
-        hint: Text("Exit"),
-        items: [
-          DropdownMenuItem(
-            child: Icon(Icons.exit_to_app),
-            value: 0,
-          ),
-          DropdownMenuItem(
-              child: Row(children: <Widget>[
-                Text('北京'),
-                SizedBox(width: 10),
-                Icon(Icons.ac_unit)
-              ]),
-              value: 1),
-          DropdownMenuItem(
-              child: Row(children: <Widget>[
-                Text('天津'),
-                SizedBox(width: 10),
-                Icon(Icons.content_paste)
-              ]),
-              value: 2),
-          DropdownMenuItem(
-              child: Row(children: <Widget>[
-                Text('河北',
-                    style: TextStyle(color: Colors.purpleAccent, fontSize: 16)),
-                SizedBox(width: 10),
-                Icon(Icons.send, color: Colors.purpleAccent)
-              ]),
-              value: 3)
-        ],
-        // items: [
-        //   DropdownMenuItem(
-        //     child: Icon(Icons.exit_to_app),
-        //     value: 0,
-        //   ),
-        //   DropdownMenuItem(
-        //     child: Text("退出登录"),
-        //     value: 1,
-        //     onTap: logout(),
-        //   ),
-        //   DropdownMenuItem(
-        //     child: Text("切换账户"),
-        //     value: 2,
-        //     onTap: change(),
-        //   ),
-        // ],
-        onChanged: (value) => setState(() {
-              print(value);
-              _value = value;
-            }));
   }
 
   // 个人中心头部
@@ -194,7 +137,7 @@ class _PersonalCenterState extends State<PersonalCenter> {
               height: 60.0,
             ),
             _personalHeader(),
-            _exit(),
+            // _exit(),
             _gridViewList(),
           ],
         ),

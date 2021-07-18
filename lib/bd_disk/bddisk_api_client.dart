@@ -22,8 +22,7 @@ class BdDiskApiClient {
   final diskQuotaPath = "/api/quota";
   final diskFilesPath = "/rest/2.0/xpan/file";
   final accessToken =
-      "123.350cacdb6d9797a2e7ae89e43d68ecdd.YQ_3qnlkKUxRhkJ3eimcve3Uk3-9elPTopSD"
-      "HdT.SzEiEQ";
+      "123.e43ff8240ee3320515b0e4d839e00cd8.Y7318QwBaPQMoOV130rjpHJWxK8Gi4KXJBgD0nQ.0jNWnw";
 
 //  http请求
   Future<BdDiskUser> getUserInfo() async {
