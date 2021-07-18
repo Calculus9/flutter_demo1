@@ -15,6 +15,9 @@ enum SearchState { typing, loading, fail, done, empty }
 class SearchPage extends StatefulWidget {
   //用于搜索文件
   FileStore _fileStore = SystemFileStore();
+  String currPath;
+  SearchPage(this._fileStore,{this.currPath});
+
   @override
   _SearchPageState createState() => _SearchPageState();
 }
@@ -85,7 +88,7 @@ class _SearchPageState extends State<SearchPage> {
     });
     // 搜索本地文件里面是否包含，之根据搜索所有本地文件去找
     widget._fileStore
-        .search(value, path: '/storage/emulated/0', recursion: 1)
+        .search(value, path: widget.currPath, recursion: 1)
         .then((files) {
       setState(() {
         _diskFiles = files;
@@ -187,7 +190,7 @@ class _SearchPageState extends State<SearchPage> {
   void _onDiskFileTap(DiskFile file) {
     //打开文件
     Navigator.push(context,
-        MaterialPageRoute(builder: (context) => FilePage(rootpath: file.path)));
+        MaterialPageRoute(builder: (context) => FilePage(rootpath: file.path,allowPop: true,)));
   }
 
   /// 根据搜索切换不同的状态
@@ -217,7 +220,6 @@ class _SearchPageState extends State<SearchPage> {
             ],
           ),
         );
-
       case SearchState.fail:
       case SearchState.empty:
         return Column(

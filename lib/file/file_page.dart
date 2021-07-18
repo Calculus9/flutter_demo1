@@ -1,18 +1,26 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_demo1/bd_disk/bd_disk_file_store.dart';
 import 'package:flutter_demo1/file/file_store.dart';
 import 'package:flutter_demo1/search/search_input_widget.dart';
 import 'package:flutter_demo1/search/search_page.dart';
 import 'package:flutter_demo1/system/system_file_store.dart';
 import 'package:flutter_demo1/utils.dart';
-
+import 'package:path/path.dart' as PathUtils;
 import 'disk_file.dart';
 import 'file_list_widget.dart';
 
 class FilePage extends StatefulWidget {
-  FileStore _fileStore = SystemFileStore();
+  FileStore _fileStore = BdDiskFileStore();
   String rootpath;
-  FilePage({FileStore fileStore,this.rootpath = '/storage/emulated/0'}) {
+  bool allowPop;
+
+  FilePage(
+      {FileStore fileStore,
+      this.rootpath = '/storage/emulated/0',
+      this.allowPop = false}) {
     if (fileStore != null) _fileStore = fileStore;
   }
   @override
@@ -46,12 +54,13 @@ class _FilePageState extends State<FilePage> {
   _onFocusSearchInputWidget() {
     // Navigator.of(context).pop();
     Navigator.of(context).push(
-      new MaterialPageRoute(builder: (context) => new SearchPage()),
+      new MaterialPageRoute(
+          builder: (context) => new SearchPage(
+                widget._fileStore,
+                currPath: _currPath,
+              )),
     );
   }
-
-  /// 提交搜索框内容
-  _onSubmittedSearchInputWidget(String keyword) {}
 
   Widget _cancel() {
     // ignore: deprecated_member_use
@@ -67,29 +76,33 @@ class _FilePageState extends State<FilePage> {
   }
 
   /// 刷新磁盘文件
-  _refreshDiskFiles() {
-    if (_currPath.length <= "/storage/emulated".length) {
-      return showDialog(
-          context: this.context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text("系统提醒"),
-              content: Text("无法返回"),
-              actions: <Widget>[
-                _cancel(),
-              ],
-            );
-          });
-    }
+  void _refreshDiskFiles() {
+    setState(() => _filesState = FilesState.loading);
+    if (_currPath == '/storage/emulated/0') _currPath = '/';
     widget._fileStore.listFiles(_currPath).then((files) {
       setState(() {
         listOfDiskFiles = files;
+        _title = PathUtils.basenameWithoutExtension(_currPath);
+        _filesState = FilesState.loaded;
+      });
+    }, onError: (e) {
+      setState(() {
+        _filesState = FilesState.fail;
+        if (e is FileSystemException) {
+        } else {
+          _failMsg = e.toString();
+        }
       });
     });
   }
 
   /// 返回上一级菜单
   _onBackParentDir() {
+    if (widget.rootpath.compareTo(_currPath) == 0 && widget.allowPop) {
+      Navigator.pop(context);
+      return Future.value(false);
+    }
+
     _currPath = Utils.getFatherDir(_currPath);
     _title = Utils.getCurPtahFileName(_currPath);
     _refreshDiskFiles();
@@ -100,15 +113,48 @@ class _FilePageState extends State<FilePage> {
     if (file.isDir == 0) return;
     _title = file.serverFilename;
     _currPath = file.path;
+    print(_currPath);
     _refreshDiskFiles();
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => _buildFilesWidget();
+
+  Widget _buildFilesWidget() {
+    switch (_filesState) {
+      case FilesState.loading:
+        return Container(
+            alignment: Alignment.center,
+            child: CircularProgressIndicator(
+              strokeWidth: 40,
+            ));
+      case FilesState.loaded:
+        return loaded_build();
+      case FilesState.fail:
+        return Container(
+            alignment: Alignment.center,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 300,
+                ),
+                IconButton(
+                    icon: Icon(Icons.refresh),
+                    iconSize: 96,
+                    onPressed: _refreshDiskFiles),
+                Text(_failMsg)
+              ],
+            ));
+    }
+  }
+
+  // 构建文件页面
+  Widget loaded_build() {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _title,
+          _title == "" ? "根目录" : _title,
           style: TextStyle(color: Colors.black),
         ),
         backgroundColor: Color(0xffeeeeee),
@@ -136,4 +182,9 @@ class _FilePageState extends State<FilePage> {
       ),
     );
   }
+
+// @override
+  // Widget build(BuildContext context) {
+  //
+  // }
 }

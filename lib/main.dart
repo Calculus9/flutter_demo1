@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_demo1/file/file_page.dart';
 import 'package:flutter_demo1/personal_center.dart';
 
+import 'login_bd_page.dart';
 import 'login_page.dart';
 
 void main() {
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '百度网盘',
-      home: LoginPage(),
+      home: Temp(),
     );
   }
 }

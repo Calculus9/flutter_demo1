@@ -1,14 +1,12 @@
-class Utils {
-  // 获取系统当前的时间戳
-  static currentTimeSeconds() {
-    var now = new DateTime.now();
-    return (now.microsecondsSinceEpoch);
-  }
 
-  // 将时间戳转换成时间字符串
-  static String getDateTime(seconds) {
-    var date = DateTime.fromMicrosecondsSinceEpoch(seconds);
-    return "${date.year.toString()}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}-${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
+import 'package:intl/intl.dart';
+
+class Utils {
+  static getDateTime(int time) {
+    var date = new DateTime.fromMillisecondsSinceEpoch(time * 1000);
+    var formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
+    String formatted = formatter.format(date);
+    return formatted;
   }
 
   // 将文件字节转为B, KB, MB, GB

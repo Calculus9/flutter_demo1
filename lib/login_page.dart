@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo1/user.dart';
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import 'main.dart';
 
@@ -10,6 +13,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final String url =
+      "https://openapi.baidu.com/oauth/2.0/authorize?response_type=token&redirect_uri=oob&display=mobile&client_id=NqOMXF6XGhGRIGemsQ9nG0Na&scope=basic%20netdisk";
+
   ///font
   final _biggerFont =
       const TextStyle(fontSize: 30.0, fontWeight: FontWeight.w600);
@@ -37,6 +43,12 @@ class _LoginPageState extends State<LoginPage> {
       _checkUserInput();
     });
     super.initState();
+
+    // Enable hybrid composition.
+    if (Platform.isAndroid) {
+      print("安卓");
+      WebView.platform = SurfaceAndroidWebView();
+    }
   } // 提示框
 
   // 1.确认按钮

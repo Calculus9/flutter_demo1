@@ -21,4 +21,5 @@ class AppConfig {
 
   String defaultFilesRootPath = '/';
   bool showAllFiles = false;
+
 }
