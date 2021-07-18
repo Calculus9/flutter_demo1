@@ -73,7 +73,8 @@ class Temp extends StatefulWidget {
 
 class _TempState extends State<Temp> {
   final String url =
-      "https://openapi.baidu.com/oauth/2.0/authorize?response_type=token&redirect_uri=oob&display=mobile&client_id=NqOMXF6XGhGRIGemsQ9nG0Na&scope=basic%20netdisk";
+      "https://openapi.baidu.com/oauth/2.0/authorize?response_type=token&redirect_uri=oob&display=mobile&"
+      "client_id=NqOMXF6XGhGRIGemsQ9nG0Na&scope=basic%20netdisk";
 
   FlutterWebviewPlugin flutterWebviewPlugin = FlutterWebviewPlugin();
   @override
@@ -97,7 +98,7 @@ class _TempState extends State<Temp> {
 
   // 首页检查token
   _checkOAuth2Result(BuildContext context, String url) async {
-    //替换第一次出现#字符位置的字符
+    //替换第一次出现 #字符位置的字符
     url = url.replaceFirst('#', '?');
     Uri uri = Uri.parse(url);
     if (uri == null) return;

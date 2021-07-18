@@ -41,7 +41,7 @@ class _PersonalCenterState extends State<PersonalCenter> {
     return Container(
       child: ClipOval(
         child: FadeInImage.assetNetwork(
-          placeholder: "assets/file.png",
+          placeholder: "assets/user-head.jpg",
           image: _avatar_url,
           width: 60,
           height: 60,
