@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_demo1/bd_disk/bddisk_api_client.dart';
+import 'package:flutter_demo1/bd_disk/user_repository.dart';
 import 'package:flutter_demo1/utils.dart';
 
 import 'bd_disk/bd_disk_user.dart';
@@ -11,9 +12,12 @@ class PersonalCenter extends StatefulWidget {
 }
 
 class _PersonalCenterState extends State<PersonalCenter> {
-  var _avatar_url = "assets/user-head.jpg";
-  var _username, _used, _total, _quota_des;
-  var _vip_type;
+  UserRepository userRepository;
+  String _avatar_url;
+  var _username;
+  int _used = 1, _total = 1;
+  String _quota_des = "";
+  int _vip_type = 0;
 
   /// 数据列表
   List listData = [
@@ -42,7 +46,9 @@ class _PersonalCenterState extends State<PersonalCenter> {
       child: ClipOval(
         child: FadeInImage.assetNetwork(
           placeholder: "assets/user-head.jpg",
-          image: _avatar_url,
+          image: _avatar_url == null
+              ? "https://bpic.588ku.com/element_origin_min_pic/17/06/13/5c5a1442f0ec72e59829ee10d891f224.jpg"
+              : _avatar_url,
           width: 60,
           height: 60,
         ),
@@ -62,7 +68,7 @@ class _PersonalCenterState extends State<PersonalCenter> {
         ),
         SizedBox(width: 5.0),
         Container(
-          child: Image.asset("assets/user-level${_vip_type}.png"),
+          child: Image.asset("assets/user-level$_vip_type.png"),
           width: 25.0,
           height: 25.0,
         )
@@ -76,7 +82,7 @@ class _PersonalCenterState extends State<PersonalCenter> {
       width: 300.0,
       child: LinearProgressIndicator(
           backgroundColor: Colors.grey,
-          value: _used/_total,
+          value: _used * (1.0) / _total,
           valueColor: new AlwaysStoppedAnimation<Color>(Colors.blue)),
     );
   }
@@ -147,34 +153,16 @@ class _PersonalCenterState extends State<PersonalCenter> {
 
   @override
   void initState() {
+    super.initState();
     var apiClient = BdDiskApiClient();
-
-    Future getUserInformation() async {
-      BdDiskUser user = await apiClient.getUserInfo();
-      return user;
-    }
-
-    Future getUserInfo() async {
-      BdDiskUser user = await apiClient.getUserInfo();
-      return user;
-    }
-
-    Future getDiskQuota() async {
-      var quota = await apiClient.getDiskQuota();
-      return quota;
-    }
-
-    // 获取用户信息
-    getUserInfo().then((user) {
+    apiClient.getUserInfo().then((user) {
       setState(() {
         _avatar_url = user.avatarUrl;
         _username = user.baiduName;
         _vip_type = user.vipType;
       });
     });
-
-    // 获取容量信息
-    getDiskQuota().then((quota) {
+    apiClient.getDiskQuota().then((quota) {
       setState(() {
         _used = quota.used;
         _total = quota.total;

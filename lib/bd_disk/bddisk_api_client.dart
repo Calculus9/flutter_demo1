@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_demo1/bd_disk/bd_disk_file.dart';
 import 'package:flutter_demo1/bd_disk/bd_disk_user.dart';
 import 'package:flutter_demo1/bd_disk/disk_quota.dart';
+import 'package:flutter_demo1/user.dart';
 
 class BdDiskApiClient {
 //  由于使用http协议因此引入http进入
@@ -21,8 +22,8 @@ class BdDiskApiClient {
   final userInfoPath = "/rest/2.0/xpan/nas";
   final diskQuotaPath = "/api/quota";
   final diskFilesPath = "/rest/2.0/xpan/file";
-  final accessToken =
-      "123.e43ff8240ee3320515b0e4d839e00cd8.Y7318QwBaPQMoOV130rjpHJWxK8Gi4KXJBgD0nQ.0jNWnw";
+  var accessToken = User.tokenValue;
+  // "123.e43ff8240ee3320515b0e4d839e00cd8.Y7318QwBaPQMoOV130rjpHJWxK8Gi4KXJBgD0nQ.0jNWnw";
 
 //  http请求
   Future<BdDiskUser> getUserInfo() async {

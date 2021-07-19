@@ -15,6 +15,7 @@ enum SearchState { typing, loading, fail, done, empty }
 class SearchPage extends StatefulWidget {
   //用于搜索文件
   FileStore _fileStore = SystemFileStore();
+
   String currPath;
   SearchPage(this._fileStore,{this.currPath});
 

@@ -96,22 +96,29 @@ class _TempState extends State<Temp> {
     );
   }
 
-  // 首页检查token
+  // 首页检查 token，检查我的bdToken,如果有就直接返回，没有就利用prefs里面的缓存
   _checkOAuth2Result(BuildContext context, String url) async {
+
     //替换第一次出现 #字符位置的字符
     url = url.replaceFirst('#', '?');
     Uri uri = Uri.parse(url);
     if (uri == null) return;
+
     Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
     if (uri.pathSegments.contains('login_success') &&
         uri.queryParameters.containsKey('access_token')) {
       var prefs = await _prefs;
+
       String expiresIn = uri.queryParameters['expires_in'] ?? "0";
+
       var token = BdOAuth2Token(uri.queryParameters['access_token'],
           expiresIn: int.parse(expiresIn));
+
       prefs.setJson(User.keyBdOAuth2Token, token.toJson());
+
+      var createTime = prefs.getJson(User.keyBdOAuth2Token)["create_time"];
       User.tokenValue = prefs.getJson(User.keyBdOAuth2Token)["access_token"];
-      print(User.tokenValue);
+
       Navigator.of(context).pop();
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => MyHomePage()));
